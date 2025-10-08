@@ -4,30 +4,34 @@ import { useNavigate, useParams } from "react-router-dom";
 
 const EditAssessment = () => {
   const { assessmentId } = useParams();
-  console.log("Assessment ID from URL:", assessmentId);
   const navigate = useNavigate();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [dueDate, setDueDate] = useState("");
   const [questions, setQuestions] = useState([]);
 
+  const API_BASE = process.env.REACT_APP_BACKEND_URI; // ✅ Backend URL from env
+
   useEffect(() => {
     const fetchAssessment = async () => {
       try {
-        const response = await axios.get(`http://localhost:5000/api/assessments/${assessmentId}`);
-
+        const response = await axios.get(`${API_BASE}/api/assessments/${assessmentId}`); // ✅ use env variable
         const { title, description, dueDate, questions } = response.data;
 
         setTitle(title || "");
         setDescription(description || "");
         setDueDate(dueDate ? new Date(dueDate).toISOString().split("T")[0] : "");
-        setQuestions(questions?.length ? questions : [{ questionText: "", options: ["", "", "", ""], correctAnswer: "" }]);
+        setQuestions(
+          questions?.length
+            ? questions
+            : [{ questionText: "", options: ["", "", "", ""], correctAnswer: "" }]
+        );
       } catch (error) {
         console.error("Error fetching assessment:", error);
       }
     };
     fetchAssessment();
-  }, [assessmentId]);
+  }, [assessmentId, API_BASE]);
 
   const handleQuestionChange = (qIndex, field, value) => {
     setQuestions((prev) => {
@@ -57,11 +61,11 @@ const EditAssessment = () => {
     e.preventDefault();
     try {
       await axios.put(
-        `http://localhost:5000/api/assessments/${assessmentId}`, // ✅ Ensure assessmentId is defined
+        `${API_BASE}/api/assessments/${assessmentId}`, // ✅ use env variable
         { title, description, dueDate, questions },
-        { headers: { Authorization: 'Bearer ${localStorage.getItem("token")}' } }
+        { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } } // ✅ template string fix
       );
-      
+
       alert("✅ Assessment Updated Successfully!");
       navigate("/assessments");
     } catch (error) {
@@ -119,6 +123,5 @@ const styles = {
   submitButton: { padding: "10px", border: "none", borderRadius: "8px", background: "#003c8f", color: "white", cursor: "pointer", marginTop: "10px", marginLeft: "10px" },
   cancelButton: { padding: "10px", border: "none", borderRadius: "8px", background: "#dc3545", color: "white", cursor: "pointer", marginTop: "10px", marginLeft: "10px" },
 };
-
 
 export default EditAssessment;
