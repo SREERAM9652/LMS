@@ -16,6 +16,8 @@ const CreateCourse = () => {
         img: "",
     });
 
+    const API_BASE = process.env.REACT_APP_BACKEND_URI; // ✅ Backend URL from env
+
     // Fetch role from localStorage
     useEffect(() => {
         const storedRole = localStorage.getItem("role");
@@ -45,7 +47,7 @@ const CreateCourse = () => {
         }
 
         try {
-            await axios.post("http://localhost:5000/api/courses", course);
+            await axios.post(`${API_BASE}/api/courses`, course); // ✅ use env variable
             alert("🎉 Course added successfully!");
             navigate("/courses");
         } catch (error) {
