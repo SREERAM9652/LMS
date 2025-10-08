@@ -10,6 +10,9 @@ const AdminDashboard = () => {
 
   const userId = localStorage.getItem("userId"); // Admin user ID
 
+  // ✅ Use environment variable for backend URL
+  const API_BASE = process.env.REACT_APP_BACKEND_URI;
+
   useEffect(() => {
     fetchSummary();
     fetchUsers();
@@ -19,27 +22,27 @@ const AdminDashboard = () => {
   }, []);
 
   const fetchSummary = async () => {
-    const res = await axios.get(`http://localhost:5000/api/admin/summary?userId=${userId}`);
+    const res = await axios.get(`${API_BASE}/api/admin/summary?userId=${userId}`);
     setSummary(res.data);
   };
 
   const fetchUsers = async () => {
-    const res = await axios.get(`http://localhost:5000/api/admin/users?userId=${userId}`);
+    const res = await axios.get(`${API_BASE}/api/admin/users?userId=${userId}`);
     setUsers(res.data);
   };
 
   const fetchCourses = async () => {
-    const res = await axios.get(`http://localhost:5000/api/admin/courses?userId=${userId}`);
+    const res = await axios.get(`${API_BASE}/api/admin/courses?userId=${userId}`);
     setCourses(res.data);
   };
 
   const fetchAssessments = async () => {
-    const res = await axios.get(`http://localhost:5000/api/admin/assessments?userId=${userId}`);
+    const res = await axios.get(`${API_BASE}/api/admin/assessments?userId=${userId}`);
     setAssessments(res.data);
   };
 
   const fetchSubmissions = async () => {
-    const res = await axios.get(`http://localhost:5000/api/admin/submissions?userId=${userId}`);
+    const res = await axios.get(`${API_BASE}/api/admin/submissions?userId=${userId}`);
     setSubmissions(res.data);
   };
 
@@ -48,11 +51,8 @@ const AdminDashboard = () => {
       <style>
         {`
           .dashboard-container {
-            padding: 300px;
-            padding-top:10px;
-            margin-left: 1000px;
+            padding: 20px;
             max-width: 1200px;
-            
             margin: auto;
           }
 
@@ -96,8 +96,7 @@ const AdminDashboard = () => {
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
           }
 
-          th,
-          td {
+          th, td {
             padding: 15px;
             text-align: left;
             border-top: 1px solid #ddd;
@@ -119,8 +118,7 @@ const AdminDashboard = () => {
             margin-bottom: 20px;
           }
 
-          .table-container td,
-          .table-container th {
+          .table-container td, .table-container th {
             font-size: 1rem;
             color: #333;
           }
@@ -170,9 +168,7 @@ const Section = ({ title, data, columns }) => (
         <thead>
           <tr>
             {columns.map((col) => (
-              <th key={col} className="px-4 py-2 text-left capitalize">
-                {col}
-              </th>
+              <th key={col} className="px-4 py-2 text-left capitalize">{col}</th>
             ))}
           </tr>
         </thead>
@@ -189,9 +185,7 @@ const Section = ({ title, data, columns }) => (
             ))
           ) : (
             <tr>
-              <td colSpan={columns.length} className="px-4 py-2 text-center">
-                No data found.
-              </td>
+              <td colSpan={columns.length} className="px-4 py-2 text-center">No data found.</td>
             </tr>
           )}
         </tbody>
