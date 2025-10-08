@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 
+const BASE_URL = "http://localhost:5000/api"; // <-- Update this to your backend URL
+
 const PersonalInfo = () => {
   const [personalInfo, setPersonalInfo] = useState(null);
   const [error, setError] = useState("");
@@ -22,7 +24,7 @@ const PersonalInfo = () => {
     }
 
     axios
-      .get(`http://localhost:5000/api/profile/personal-info/${userId}`)
+      .get(`${BASE_URL}/profile/personal-info/${userId}`)
       .then((response) => {
         const { fullName, email, phone, dob, gender, role } = response.data;
         setPersonalInfo(response.data);
@@ -55,28 +57,25 @@ const PersonalInfo = () => {
       alert("User ID is missing.");
       return;
     }
-  
-    // Prevent users from changing their role to admin
+
     if (formData.role === "admin" && personalInfo.role !== "admin") {
       setError("You cannot change your role to admin.");
       return;
     }
-  
+
     axios
-      .put(`http://localhost:5000/api/profile/update-personal-info/${userId}`, formData)
+      .put(`${BASE_URL}/profile/update-personal-info/${userId}`, formData)
       .then((response) => {
         setPersonalInfo(response.data);
         setIsEditing(false);
-        setError(""); // Clear error on success
+        setError("");
       })
       .catch((error) => {
         console.error("Error updating personal info:", error);
         setError("An error occurred while updating your details.");
       });
   };
-  
 
-  // **🎨 Enhanced Styling**
   const styles = {
     wrapper: {
       display: "flex",
@@ -86,7 +85,6 @@ const PersonalInfo = () => {
       paddingLeft: "280px",
       paddingRight: "40px",
       transition: "padding-left 0.3s ease-in-out",
-      
     },
     container: {
       width: "650px",
