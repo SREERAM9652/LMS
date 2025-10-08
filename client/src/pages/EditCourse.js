@@ -1,17 +1,25 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import axios from "axios";
 
 const EditCourse = () => {
     const { id } = useParams();
     const navigate = useNavigate();
     const [course, setCourse] = useState({ title: "", desc: "", price: "", img: "", video: "" });
 
+    const API_BASE = process.env.REACT_APP_BACKEND_URI; // ✅ Use env variable
+
     useEffect(() => {
-        fetch(`http://localhost:5000/api/courses/${id}`)
-            .then((res) => res.json())
-            .then((data) => setCourse(data))
-            .catch((err) => console.error("Error fetching course:", err));
-    }, [id]);
+        const fetchCourse = async () => {
+            try {
+                const response = await axios.get(`${API_BASE}/api/courses/${id}`);
+                setCourse(response.data);
+            } catch (err) {
+                console.error("Error fetching course:", err);
+            }
+        };
+        fetchCourse();
+    }, [id, API_BASE]);
 
     const handleChange = (e) => {
         setCourse({ ...course, [e.target.name]: e.target.value });
@@ -20,20 +28,14 @@ const EditCourse = () => {
     const handleUpdate = async (e) => {
         e.preventDefault();
         try {
-            const response = await fetch(`http://localhost:5000/api/courses/${id}`, {
-                method: "PUT",
+            await axios.put(`${API_BASE}/api/courses/${id}`, course, {
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(course),
             });
-
-            if (response.ok) {
-                alert("✅ Course updated successfully!");
-                navigate("/courses");
-            } else {
-                alert("❌ Failed to update course");
-            }
+            alert("✅ Course updated successfully!");
+            navigate("/courses");
         } catch (error) {
             console.error("Error updating course:", error);
+            alert("❌ Failed to update course");
         }
     };
 
@@ -63,90 +65,30 @@ const EditCourse = () => {
                     ✏️ Edit Course
                 </h2>
                 <form onSubmit={handleUpdate} style={{ display: "flex", flexDirection: "column", gap: "15px" }}>
-                    <label style={{ fontSize: "16px", fontWeight: "bold", color: "#555" }}>Title:</label>
-                    <input 
-                        type="text" 
-                        name="title" 
-                        value={course.title} 
-                        onChange={handleChange} 
-                        required 
-                        style={{
-                            padding: "10px",
-                            border: "1px solid #ccc",
-                            borderRadius: "8px",
-                            fontSize: "16px",
-                        }}
-                    />
+                    <label style={styles.label}>Title:</label>
+                    <input type="text" name="title" value={course.title} onChange={handleChange} required style={styles.input} />
 
-                    <label style={{ fontSize: "16px", fontWeight: "bold", color: "#555" }}>Description:</label>
-                    <textarea 
-                        name="desc" 
-                        value={course.desc} 
-                        onChange={handleChange} 
-                        required 
-                        rows="3"
-                        style={{
-                            padding: "10px",
-                            border: "1px solid #ccc",
-                            borderRadius: "8px",
-                            fontSize: "16px",
-                            resize: "none",
-                        }}
-                    />
+                    <label style={styles.label}>Description:</label>
+                    <textarea name="desc" value={course.desc} onChange={handleChange} required rows="3" style={styles.textarea} />
 
-                    <label style={{ fontSize: "16px", fontWeight: "bold", color: "#555" }}>Price:</label>
-                    <input 
-                        type="number" 
-                        name="price" 
-                        value={course.price} 
-                        onChange={handleChange} 
-                        required 
-                        style={{
-                            padding: "10px",
-                            border: "1px solid #ccc",
-                            borderRadius: "8px",
-                            fontSize: "16px",
-                        }}
-                    />
+                    <label style={styles.label}>Price:</label>
+                    <input type="number" name="price" value={course.price} onChange={handleChange} required style={styles.input} />
 
-                    <label style={{ fontSize: "16px", fontWeight: "bold", color: "#555" }}>Image URL:</label>
-                    <input 
-                        type="text" 
-                        name="img" 
-                        value={course.img} 
-                        onChange={handleChange} 
-                        required 
-                        style={{
-                            padding: "10px",
-                            border: "1px solid #ccc",
-                            borderRadius: "8px",
-                            fontSize: "16px",
-                        }}
-                    />
+                    <label style={styles.label}>Image URL:</label>
+                    <input type="text" name="img" value={course.img} onChange={handleChange} required style={styles.input} />
 
-                    
-
-                    <button 
-                        type="submit" 
-                        style={{
-                            backgroundColor: "#007bff",
-                            color: "white",
-                            padding: "12px",
-                            fontSize: "16px",
-                            fontWeight: "bold",
-                            border: "none",
-                            borderRadius: "8px",
-                            cursor: "pointer",
-                            transition: "all 0.3s ease",
-                            marginTop: "10px",
-                        }}
-                    >
-                        ✅ Update Course
-                    </button>
+                    <button type="submit" style={styles.submitButton}>✅ Update Course</button>
                 </form>
             </div>
         </section>
     );
+};
+
+const styles = {
+    label: { fontSize: "16px", fontWeight: "bold", color: "#555" },
+    input: { padding: "10px", border: "1px solid #ccc", borderRadius: "8px", fontSize: "16px" },
+    textarea: { padding: "10px", border: "1px solid #ccc", borderRadius: "8px", fontSize: "16px", resize: "none" },
+    submitButton: { backgroundColor: "#007bff", color: "white", padding: "12px", fontSize: "16px", fontWeight: "bold", border: "none", borderRadius: "8px", cursor: "pointer", transition: "all 0.3s ease", marginTop: "10px" },
 };
 
 export default EditCourse;
