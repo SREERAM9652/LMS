@@ -20,7 +20,7 @@ const ForumPage = () => {
   useEffect(() => {
     const fetchCourses = async () => {
       try {
-        const response = await axios.get("http://localhost:5000/api/courses");
+        const response = await axios.get("https://lms-2inz.onrender.com/api/courses");
         setCourses(response.data);
       } catch (error) {
         console.error("Error fetching courses:", error);
@@ -31,7 +31,7 @@ const ForumPage = () => {
 
   const fetchForums = async () => {
     try {
-      const response = await axios.get("http://localhost:5000/api/forums");
+      const response = await axios.get("https://lms-2inz.onrender.com/api/forums");
       setForums(response.data);
     } catch (error) {
       console.error("Error fetching forums:", error);
@@ -47,7 +47,7 @@ const ForumPage = () => {
       return;
     }
     try {
-      const response = await axios.post("http://localhost:5000/api/forums/create", { ...newForum, userId });
+      const response = await axios.post("https://lms-2inz.onrender.com/api/forums/create", { ...newForum, userId });
       setForums([...forums, response.data]);
       setNewForum({ title: "", description: "", courseId: "" });
     } catch (error) {
@@ -62,7 +62,7 @@ const ForumPage = () => {
     
     try {
       const response = await axios.post(
-        `http://localhost:5000/api/forums/${forumId}/reply`,
+        `https://lms-2inz.onrender.com/api/forums/${forumId}/reply`,
         { text: replies[forumId], userId },  // Ensure userId is included
         { headers: { "Content-Type": "application/json" } }
       );
@@ -77,7 +77,7 @@ const ForumPage = () => {
   const deleteReply = async (forumId, replyId, replyUserId) => {
     if (replyUserId !== userId && role !== "admin" && role !== "instructor") return;
     try {
-      await axios.delete(`http://localhost:5000/api/forums/${forumId}/reply/${replyId}`, {
+      await axios.delete(`https://lms-2inz.onrender.com/api/forums/${forumId}/reply/${replyId}`, {
         data: { userId, role },
       });
       fetchForums();
@@ -88,7 +88,7 @@ const ForumPage = () => {
 
   const deleteForum = async (forumId) => {
     try {
-        await axios.delete(`http://localhost:5000/api/forums/${forumId}`, {
+        await axios.delete(`https://lms-2inz.onrender.com/api/forums/${forumId}`, {
             data: { userId }, // Send user ID for authorization
         });
         fetchForums(); // Refresh forums after deletion
@@ -99,7 +99,7 @@ const ForumPage = () => {
 
 const deleteResponse = async (forumId, replyId, responseId) => {
     try {
-      await axios.delete(`http://localhost:5000/api/forums/${forumId}/reply/${replyId}/response/${responseId}`, {
+      await axios.delete(`https://lms-2inz.onrender.com/api/forums/${forumId}/reply/${replyId}/response/${responseId}`, {
         headers: { "Content-Type": "application/json" }, // <-- Add this
         data: { userId, role }, // Send userId for authentication
       });
@@ -114,7 +114,7 @@ const deleteResponse = async (forumId, replyId, responseId) => {
   const respondToReply = async (forumId, replyId) => {
     if (!responses[replyId]) return;
     try {
-        await axios.post(`http://localhost:5000/api/forums/${forumId}/reply/${replyId}/respond`, { text: responses[replyId], adminId: userId });
+        await axios.post(`https://lms-2inz.onrender.com/api/forums/${forumId}/reply/${replyId}/respond`, { text: responses[replyId], adminId: userId });
 
       fetchForums();
       setResponses({ ...responses, [replyId]: "" });
@@ -260,7 +260,6 @@ const deleteResponse = async (forumId, replyId, responseId) => {
             <div className="forum-header">
       <h3>{forum.title}</h3>
 
-      {/* Delete Icon (Only for Admins/Instructors) */}
       {(role === "admin" || role === "instructor") && (
         <button className="delete-btn" onClick={() => deleteForum(forum._id)}>
           🗑️
@@ -274,21 +273,16 @@ const deleteResponse = async (forumId, replyId, responseId) => {
               <button className="btn btn-primary" onClick={() => postReply(forum._id)}>Reply</button>
             </div>
 
-
-            
-
             {forum.replies && forum.replies.map((reply) => (
               <div key={reply._id} className="reply-section">
                 <p>{reply.text} - <i>by {reply.user.fullName}</i></p>
 
-                {/* Show Responses (Admin Replies) */}
     {reply.responses && reply.responses.length > 0 && (
       <div className="response-section">
         <strong>Admin Responses:</strong>
         {reply.responses.map((response) => (
           <div key={response._id} className="response-item">
             <p>{response.text} - <i>by {response.admin?.fullName || "Admin"}</i></p>
-            {/* Delete "X" button (Only for Admins/Instructors) */}
         {(role === "admin" || role === "instructor") && (
           <button className="delete-response-btn" onClick={() => deleteResponse(forum._id, reply._id, response._id)}>
             ❌
@@ -298,8 +292,6 @@ const deleteResponse = async (forumId, replyId, responseId) => {
         ))}
       </div>
     )}
-
-
 
                 {(role === "admin" || role === "instructor") && (
                 <>
