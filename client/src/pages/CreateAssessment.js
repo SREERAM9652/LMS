@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
-
 const CreateAssessment = () => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -14,10 +13,12 @@ const CreateAssessment = () => {
   const [questions, setQuestions] = useState([]);
   const [showForm, setShowForm] = useState(false);
 
+  const API_BASE = process.env.REACT_APP_BACKEND_URI; // ✅ Use env variable
+
   useEffect(() => {
     const fetchCourses = async () => {
       try {
-        const response = await axios.get("http://localhost:5000/api/courses");
+        const response = await axios.get(`${API_BASE}/api/courses`);
         setCourses(response.data);
       } catch (error) {
         console.error("Error fetching courses:", error);
@@ -25,24 +26,24 @@ const CreateAssessment = () => {
     };
 
     fetchCourses();
-  }, []);
+  }, [API_BASE]);
 
   useEffect(() => {
     if (selectedCourse) {
       fetchAssessments(selectedCourse);
     }
-  }, [selectedCourse]);
+  }, [selectedCourse, API_BASE]);
 
   const fetchAssessments = async (courseId) => {
     try {
-      const response = await axios.get(`http://localhost:5000/api/assessments/course/${courseId}`);
+      const response = await axios.get(`${API_BASE}/api/assessments/course/${courseId}`);
       setAssessments(response.data);
     } catch (error) {
       console.error("Error fetching assessments:", error);
-      setAssessments([]); // Reset if no assessments are found
+      setAssessments([]);
     }
   };
-  // ✅ Function to handle changes in question fields
+
   const handleQuestionChange = (qIndex, field, value) => {
     setQuestions((prevQuestions) => {
       const updatedQuestions = [...prevQuestions];
@@ -51,7 +52,6 @@ const CreateAssessment = () => {
     });
   };
 
-  // ✅ Function to handle changes in answer options
   const handleOptionChange = (qIndex, optIndex, value) => {
     setQuestions((prevQuestions) => {
       const updatedQuestions = [...prevQuestions];
@@ -65,33 +65,27 @@ const CreateAssessment = () => {
   };
 
   const handleDeleteAssessment = async (assessmentId) => {
-    if (!assessmentId) {
-      alert("❌ Invalid assessment ID.");
-      return;
-    }
-  
-    const confirmDelete = window.confirm("Are you sure you want to delete this assessment?");
-    if (!confirmDelete) return;
-  
+    if (!assessmentId) return alert("❌ Invalid assessment ID.");
+    if (!window.confirm("Are you sure you want to delete this assessment?")) return;
+
     try {
-      const response = await axios.delete(`http://localhost:5000/api/assessments/${assessmentId}`, {
+      const response = await axios.delete(`${API_BASE}/api/assessments/${assessmentId}`, {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
-  
+
       alert(response.data.message);
-      fetchAssessments(selectedCourse); // Refresh the list after deletion
+      fetchAssessments(selectedCourse);
     } catch (error) {
       console.error("Error deleting assessment:", error.response?.data || error.message);
       alert("❌ Failed to delete assessment.");
     }
   };
-  
+
   const handleDeleteQuestion = (qIndex) => {
     const updatedQuestions = [...questions];
     updatedQuestions.splice(qIndex, 1);
     setQuestions(updatedQuestions);
   };
-  
 
   const handleAddQuestion = () => {
     setQuestions([...questions, { questionText: "", options: ["", "", "", ""], correctAnswer: "" }]);
@@ -106,17 +100,10 @@ const CreateAssessment = () => {
       return;
     }
 
-    const requestData = {
-      userId,
-      title,
-      description,
-      courseId: selectedCourse,
-      dueDate,
-      questions,
-    };
+    const requestData = { userId, title, description, courseId: selectedCourse, dueDate, questions };
 
     try {
-      await axios.post("http://localhost:5000/api/assessments/create", requestData, {
+      await axios.post(`${API_BASE}/api/assessments/create`, requestData, {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
 
@@ -157,13 +144,9 @@ const CreateAssessment = () => {
               ))}
             </ul>
           </div>
-        ) : (
-          selectedCourse && <p style={styles.noDataText}>No assessments found for this course.</p>
-        )}
+        ) : selectedCourse && <p style={styles.noDataText}>No assessments found for this course.</p>}
 
-        <button onClick={() => setShowForm(true)} style={styles.addButton}>
-          ➕ Add New Assessment
-        </button>
+        <button onClick={() => setShowForm(true)} style={styles.addButton}>➕ Add New Assessment</button>
 
         {showForm && (
           <form onSubmit={handleSubmit} style={styles.form}>
@@ -176,61 +159,27 @@ const CreateAssessment = () => {
             <label style={styles.label}>Due Date:</label>
             <input type="date" value={dueDate} onChange={(e) => setDueDate(e.target.value)} required style={styles.input} />
 
-            
-{questions.map((q, qIndex) => (
-  <div key={qIndex} style={styles.questionContainer}>
-    <label style={styles.label}>Question {qIndex + 1}:</label>
-    <input
-      type="text"
-      value={q.questionText}
-      onChange={(e) => handleQuestionChange(qIndex, "questionText", e.target.value)}
-      required
-      style={styles.input}
-    />
-    {q.options.map((option, optIndex) => (
-      <input
-        key={optIndex}
-        type="text"
-        placeholder={`Option ${optIndex + 1}`}
-        value={option}
-        onChange={(e) => handleOptionChange(qIndex, optIndex, e.target.value)}
-        required
-        style={styles.input}
-      />
-    ))}
-    <label style={styles.label}>Correct Answer:</label>
-    <input
-      type="text"
-      value={q.correctAnswer}
-      onChange={(e) => handleQuestionChange(qIndex, "correctAnswer", e.target.value)}
-      required
-      style={styles.input}
-    />
+            {questions.map((q, qIndex) => (
+              <div key={qIndex} style={styles.questionContainer}>
+                <label style={styles.label}>Question {qIndex + 1}:</label>
+                <input type="text" value={q.questionText} onChange={(e) => handleQuestionChange(qIndex, "questionText", e.target.value)} required style={styles.input} />
+                {q.options.map((option, optIndex) => (
+                  <input key={optIndex} type="text" placeholder={`Option ${optIndex + 1}`} value={option} onChange={(e) => handleOptionChange(qIndex, optIndex, e.target.value)} required style={styles.input} />
+                ))}
+                <label style={styles.label}>Correct Answer:</label>
+                <input type="text" value={q.correctAnswer} onChange={(e) => handleQuestionChange(qIndex, "correctAnswer", e.target.value)} required style={styles.input} />
+                <button type="button" onClick={() => handleDeleteQuestion(qIndex)} style={styles.deleteButton}>🗑️ Delete Question</button>
+              </div>
+            ))}
 
-    {/* 🗑️ Delete Question Button */}
-    <button
-      type="button"
-      onClick={() => handleDeleteQuestion(qIndex)}
-      style={styles.deleteButton}
-    >
-      🗑️ Delete Question
-    </button>
-  </div>
-))}
-
-            <button type="button" onClick={handleAddQuestion} style={styles.addQuestionButton}>
-              ➕ Add Question
-            </button>
-            <button type="submit" style={styles.submitButton}>
-              ✅ Create Assessment
-            </button>
+            <button type="button" onClick={handleAddQuestion} style={styles.addQuestionButton}>➕ Add Question</button>
+            <button type="submit" style={styles.submitButton}>✅ Create Assessment</button>
           </form>
         )}
       </div>
     </section>
   );
 };
-
 const styles = {
   container: {
     marginLeft: "250px",
