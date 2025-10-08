@@ -4,14 +4,19 @@ import axios from "axios";
 const CompletedAssessments = () => {
   const [completed, setCompleted] = useState([]);
   const userId = localStorage.getItem("userId");
+  const API_BASE = process.env.REACT_APP_BACKEND_URI; // ✅ Use env variable
 
   useEffect(() => {
     const fetchCompleted = async () => {
-      const res = await axios.get(`http://localhost:5000/api/assessments/completed/${userId}`);
-      setCompleted(res.data);
+      try {
+        const res = await axios.get(`${API_BASE}/api/assessments/completed/${userId}`);
+        setCompleted(res.data);
+      } catch (error) {
+        console.error("Error fetching completed assessments:", error.response?.data || error.message);
+      }
     };
-    fetchCompleted();
-  }, [userId]);
+    if (userId) fetchCompleted();
+  }, [userId, API_BASE]);
 
   return (
     <div style={styles.container}>
