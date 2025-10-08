@@ -40,17 +40,13 @@ app.use("/api/admin", adminDashboardRoutes);
 
 // ✅ Connect to MongoDB
 mongoose
-  .connect(process.env.MONGO_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
+  .connect(process.env.MONGO_URI)
+  .then(() => {
+    console.log("✅ MongoDB Connection Successful");
+    // Start server only after DB connection
+    app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
   })
-  .then(() => console.log("✅ MongoDB Connection Successful"))
   .catch((err) => {
     console.error("❌ MongoDB Connection Failed:", err.message);
     process.exit(1); // Stop server if DB connection fails
   });
-
-// Start Server
-app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
-
-module.exports = mongoose;
