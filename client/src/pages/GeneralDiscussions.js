@@ -13,7 +13,7 @@ const GeneralDiscussions = () => {
 
     const fetchDiscussions = async () => {
         try {
-            const res = await axios.get("http://localhost:5000/api/discussions");
+            const res = await axios.get("https://lms-2inz.onrender.com/api/discussions");
             setDiscussions(res.data);
         } catch (error) {
             console.error("Error fetching discussions:", error);
@@ -28,7 +28,7 @@ const GeneralDiscussions = () => {
         try {
             const userId = localStorage.getItem("userId");
     
-            await axios.post("http://localhost:5000/api/discussions", {
+            await axios.post("https://lms-2inz.onrender.com/api/discussions", {
                 title: newDiscussion.title,
                 content: newDiscussion.content,
                 author: userId,
@@ -47,21 +47,19 @@ const GeneralDiscussions = () => {
         if (!confirmDelete) return;
     
         try {
-            await axios.delete(`http://localhost:5000/api/discussions/${discussionId}`);
+            await axios.delete(`https://lms-2inz.onrender.com/api/discussions/${discussionId}`);
             setDiscussions(discussions.filter(d => d._id !== discussionId));
         } catch (error) {
             console.error("Error deleting discussion:", error);
         }
     };
     
-    
-    
     const handleReply = async (discussionId) => {
         if (!newReply) return alert("Enter a reply");
         try {
             const userId = localStorage.getItem("userId");
 
-            await axios.post("http://localhost:5000/api/replies", {
+            await axios.post("https://lms-2inz.onrender.com/api/replies", {
                 content: newReply,
                 author: userId,
                 discussion: discussionId
@@ -76,7 +74,7 @@ const GeneralDiscussions = () => {
 
     const handleDeleteReply = async (replyId, discussionId) => {
         try {
-            await axios.delete(`http://localhost:5000/api/replies/${replyId}`);
+            await axios.delete(`https://lms-2inz.onrender.com/api/replies/${replyId}`);
             setDiscussions(discussions.map(discussion => {
                 if (discussion._id === discussionId) {
                     return {
@@ -95,7 +93,7 @@ const GeneralDiscussions = () => {
         setSelectedDiscussion(discussionId);
         
         try {
-            const res = await axios.get(`http://localhost:5000/api/discussions/${discussionId}`);
+            const res = await axios.get(`https://lms-2inz.onrender.com/api/discussions/${discussionId}`);
             const updatedDiscussion = res.data;
             
             setDiscussions((prev) => 
@@ -111,7 +109,7 @@ const GeneralDiscussions = () => {
         try {
             const userId = localStorage.getItem("userId");
     
-            const res = await axios.post("http://localhost:5000/api/likes", { 
+            const res = await axios.post("https://lms-2inz.onrender.com/api/likes", { 
                 user: userId, 
                 targetId: discussionId, 
                 targetType: "Discussion" 
@@ -137,12 +135,6 @@ const GeneralDiscussions = () => {
     };
     
     
-    
-    
-    
-    
-    
-
     return (
         <div style={styles.container}>
             <h1 style={styles.title}>💬 General Discussions</h1>
@@ -175,35 +167,32 @@ const GeneralDiscussions = () => {
                         <p><strong>Author:</strong> {discussion.author?.fullName || "Unknown"}</p>
                         <div style={styles.actions}>
                             <button onClick={() => handleLike(discussion._id)} style={styles.likeButton}>👍 {discussion.likes?.length || 0}</button>
-                            {/* Hide reply button when a reply input box is active */}
                             {selectedDiscussion === discussion._id ? (
-    <button onClick={() => setSelectedDiscussion(null)} style={styles.cancelReplyButton}>
-        ❌ Cancel Reply
-    </button>
-) : (
-    <button onClick={() => setSelectedDiscussion(discussion._id)} style={styles.replyButton}>
-        💬 Reply
-    </button>
-)}
-</div>
+                                <button onClick={() => setSelectedDiscussion(null)} style={styles.cancelReplyButton}>
+                                    ❌ Cancel Reply
+                                </button>
+                            ) : (
+                                <button onClick={() => setSelectedDiscussion(discussion._id)} style={styles.replyButton}>
+                                    💬 Reply
+                                </button>
+                            )}
+                        </div>
 
-                        {/* Show all replies under each discussion */}
-<div style={styles.replySection}>
-    {discussion.replies?.map((reply) => (
-        <div key={reply._id} style={styles.replyContainer}>
-            <p style={styles.reply}>
-                <strong>{reply.author?.fullName || "Anonymous"}:</strong> {reply.content}
-            </p>
-            {/* Delete button for replies */}
-            <button 
-                onClick={() => handleDeleteReply(reply._id, discussion._id)} 
-                style={styles.deleteReplyButton}
-            >
-                🗑️ Delete
-            </button>
-        </div>
-    ))}
-</div>
+                        <div style={styles.replySection}>
+                            {discussion.replies?.map((reply) => (
+                                <div key={reply._id} style={styles.replyContainer}>
+                                    <p style={styles.reply}>
+                                        <strong>{reply.author?.fullName || "Anonymous"}:</strong> {reply.content}
+                                    </p>
+                                    <button 
+                                        onClick={() => handleDeleteReply(reply._id, discussion._id)} 
+                                        style={styles.deleteReplyButton}
+                                    >
+                                        🗑️ Delete
+                                    </button>
+                                </div>
+                            ))}
+                        </div>
 
                         {selectedDiscussion === discussion._id && (
                             <div style={styles.replyInputSection}>
@@ -237,8 +226,8 @@ const styles = {
         alignItems: "center",
     },
     title: {
-        alignSelf: "flex-start", // Aligns title to the left
-        marginLeft: "50px", // Adjust spacing from the left
+        alignSelf: "flex-start",
+        marginLeft: "50px",
         fontSize: "24px",
         fontWeight: "bold",
         color: "#003c8f",
