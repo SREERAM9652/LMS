@@ -6,6 +6,8 @@ const AttemptAssessment = () => {
   const { assessmentId } = useParams();
   const navigate = useNavigate();
   const userId = localStorage.getItem("userId");
+  const API_BASE = process.env.REACT_APP_BACKEND_URI; // ✅ Use env variable
+  const token = localStorage.getItem("token");
 
   const [assessment, setAssessment] = useState(null);
   const [selectedAnswers, setSelectedAnswers] = useState({});
@@ -16,8 +18,7 @@ const AttemptAssessment = () => {
   useEffect(() => {
     const fetchAssessment = async () => {
       try {
-        const token = localStorage.getItem("token");
-        const res = await axios.get(`http://localhost:5000/api/assessments/${assessmentId}`, {
+        const res = await axios.get(`${API_BASE}/api/assessments/${assessmentId}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setAssessment(res.data);
@@ -28,7 +29,7 @@ const AttemptAssessment = () => {
       }
     };
     fetchAssessment();
-  }, [assessmentId]);
+  }, [assessmentId, API_BASE, token]);
 
   const handleSelectAnswer = (questionId, option) => {
     setSelectedAnswers({ ...selectedAnswers, [questionId]: option });
@@ -37,14 +38,13 @@ const AttemptAssessment = () => {
   const handleSubmit = async () => {
     setSubmitting(true);
     try {
-      const token = localStorage.getItem("token");
       const answers = Object.keys(selectedAnswers).map((questionId) => ({
         questionId,
         selectedAnswer: selectedAnswers[questionId],
       }));
 
       const res = await axios.post(
-        "http://localhost:5000/api/submissions/submit",
+        `${API_BASE}/api/submissions/submit`,
         {
           userId,
           assessmentId,
