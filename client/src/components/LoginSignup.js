@@ -40,7 +40,7 @@ function LoginSignup({ formType, setIsLoggedIn }) {
     const userData = { fullName, email, password, phone, role, dob, gender };
 
     try {
-      const response = await fetch(`http://localhost:5000${endpoint}`, {
+      const response = await fetch(`https://lms-2inz.onrender.com${endpoint}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(userData),
