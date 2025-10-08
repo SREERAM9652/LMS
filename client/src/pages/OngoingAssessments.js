@@ -16,13 +16,13 @@ const OngoingAssessments = () => {
       try {
         const token = localStorage.getItem("token");
 
-        const assessmentsRes = await axios.get(`http://localhost:5000/api/assessments/ongoing/${userId}`, {
+        const assessmentsRes = await axios.get(`https://lms-2inz.onrender.com/api/assessments/ongoing/${userId}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setAssessments(assessmentsRes.data);
         setFilteredAssessments(assessmentsRes.data);
 
-        const coursesRes = await axios.get(`http://localhost:5000/api/enrolled-courses/${userId}`, {
+        const coursesRes = await axios.get(`https://lms-2inz.onrender.com/api/enrolled-courses/${userId}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setCourses(coursesRes.data);
