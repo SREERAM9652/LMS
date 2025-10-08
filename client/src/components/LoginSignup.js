@@ -12,19 +12,20 @@ function LoginSignup({ formType, setIsLoggedIn }) {
   const [dob, setDob] = useState("");
   const [gender, setGender] = useState("");
   const [error, setError] = useState("");
-  const navigate = useNavigate(); // React Router navigation
-  
+  const navigate = useNavigate();
+
+  // ✅ Use environment variable for backend URL
+  const API_BASE = process.env.REACT_APP_BACKEND_URI;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError(""); // Reset errors before making a request
+    setError("");
 
     if (formType === "signup" && role === "admin") {
       setError("You cannot be an admin.");
       return;
     }
-    
-    // Signup validation
+
     if (formType === "signup") {
       if (password !== confirmPassword) {
         setError("Passwords do not match!");
@@ -40,7 +41,7 @@ function LoginSignup({ formType, setIsLoggedIn }) {
     const userData = { fullName, email, password, phone, role, dob, gender };
 
     try {
-      const response = await fetch(`https://lms-2inz.onrender.com${endpoint}`, {
+      const response = await fetch(`${API_BASE}${endpoint}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(userData),
@@ -56,18 +57,16 @@ function LoginSignup({ formType, setIsLoggedIn }) {
       console.log(`${formType === "login" ? "Logged in" : "Signed up"} successfully!`, data);
 
       if (formType === "login") {
-        // Store userId (studentId) and role in localStorage
-        localStorage.setItem("userId", data.user._id); // Store userId (studentId)
-        localStorage.setItem("role", data.user.role); // Store user role
+        localStorage.setItem("userId", data.user._id);
+        localStorage.setItem("role", data.user.role);
         setIsLoggedIn(true);
       }
 
       if (formType === "signup") {
-        // Store user role in localStorage after signup
         localStorage.setItem("role", role);
       }
 
-      navigate("/dashboard"); // Redirect after success
+      navigate("/dashboard");
     } catch (error) {
       setError("Something went wrong. Please try again.");
       console.error("API error:", error);
@@ -99,7 +98,6 @@ function LoginSignup({ formType, setIsLoggedIn }) {
               />
               <select value={role} onChange={(e) => setRole(e.target.value)} className="auth-input" required>
                 <option value="student">Student</option>
-                
                 <option value="admin" disabled>Admin</option>
               </select>
               <input
