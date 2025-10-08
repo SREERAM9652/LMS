@@ -8,6 +8,8 @@ const Courses = () => {
     const [role, setRole] = useState(null);
     const [enrolledCourses, setEnrolledCourses] = useState([]); // to track enrolled courses
 
+    const API_BASE = process.env.REACT_APP_BACKEND_URI; // ✅ Use environment variable
+
     // Fetch role from localStorage
     useEffect(() => {
         const storedRole = localStorage.getItem("role");
@@ -18,7 +20,7 @@ const Courses = () => {
 
     // Fetch courses data from API
     useEffect(() => {
-        fetch("http://localhost:5000/api/courses")
+        fetch(`${API_BASE}/api/courses`)
             .then((res) => res.json())
             .then((data) => {
                 setCoursesData(data);
@@ -28,52 +30,51 @@ const Courses = () => {
                 console.error("Error fetching courses:", err);
                 setLoading(false);
             });
-    }, []);
+    }, [API_BASE]);
 
     // Fetch enrolled courses for the logged-in student
     useEffect(() => {
         if (role === "student") {
-            const userId = localStorage.getItem("userId"); // Use userId
+            const userId = localStorage.getItem("userId");
             if (userId) {
-                fetch(`http://localhost:5000/api/enrolled-courses/${userId}`)
+                fetch(`${API_BASE}/api/enrolled-courses/${userId}`)
                     .then((res) => res.json())
                     .then((data) => setEnrolledCourses(data))
                     .catch((err) => console.error("Error fetching enrolled courses:", err));
             }
         }
-    }, [role]);
+    }, [role, API_BASE]);
 
     const handleEnroll = async (courseId) => {
-    const userId = localStorage.getItem("userId");
-    if (!userId) return alert("User ID is missing.");
+        const userId = localStorage.getItem("userId");
+        if (!userId) return alert("User ID is missing.");
 
-    try {
-        const response = await fetch("http://localhost:5000/api/enroll-course", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ userId, courseId }),
-        });
+        try {
+            const response = await fetch(`${API_BASE}/api/enroll-course`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ userId, courseId }),
+            });
 
-        if (response.ok) {
-            alert("Enrolled successfully!");
-            setEnrolledCourses((prev) => [...prev, courseId]);
-        } else {
-            const errorResponse = await response.text();
-            alert("Error enrolling in course: " + errorResponse);
+            if (response.ok) {
+                alert("Enrolled successfully!");
+                setEnrolledCourses((prev) => [...prev, courseId]);
+            } else {
+                const errorResponse = await response.text();
+                alert("Error enrolling in course: " + errorResponse);
+            }
+        } catch (error) {
+            console.error("Error enrolling in course:", error);
+            alert("Error enrolling in course.");
         }
-    } catch (error) {
-        console.error("Error enrolling in course:", error);
-        alert("Error enrolling in course.");
-    }
-};
-
+    };
 
     // Handle delete action for admins
     const handleDelete = async (id) => {
         if (!window.confirm("Are you sure you want to delete this course?")) return;
 
         try {
-            const response = await fetch(`http://localhost:5000/api/courses/${id}`, {
+            const response = await fetch(`${API_BASE}/api/courses/${id}`, {
                 method: "DELETE",
             });
 
@@ -95,7 +96,6 @@ const Courses = () => {
 
     // Handle course creation (admin)
     const handleAddCourse = () => {
-        console.log("Navigating to create-course");
         navigate("/create-course");
     };
 
