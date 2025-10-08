@@ -1,0 +1,211 @@
+/* General styles for the container */
+.login-signup-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    background: linear-gradient(45deg, #6a11cb, #2575fc, #ff5733, #ffcc00);
+    background-size: 400% 400%;
+    animation: gradientBG 10s ease infinite;
+    color: white;
+    font-family: 'Roboto', sans-serif;
+    text-align: center;
+    overflow: hidden;
+}
+
+/* Updated form container for a wider appearance */
+.form-container {
+    display: flex;
+    flex-direction: row; /* Places elements side by side */
+    justify-content: space-between;
+    align-items: center;
+    width: 80%;
+    max-width: 900px;
+    background-color: rgba(0, 0, 0, 0.6);
+    padding: 40px;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(10px);
+}
+
+/* Left side - Information Section */
+.form-left {
+    width: 45%;
+    text-align: left;
+    padding-right: 30px;
+    border-right: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.form-left h2 {
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+
+.form-left p {
+    font-size: 1.1rem;
+    line-height: 1.6;
+    color: #ddd;
+}
+
+.form-left ul {
+    margin-top: 15px;
+    list-style: none;
+    padding: 0;
+}
+
+.form-left ul li {
+    font-size: 1rem;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+}
+
+.form-left ul li::before {
+    content: "✔";
+    color: #ffcc00;
+    margin-right: 10px;
+    font-weight: bold;
+}
+
+/* Right side - Form */
+.form-right {
+    width: 55%;
+}
+
+/* Title Styling */
+.homepage-title {
+    font-size: 2.5rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 20px;
+    color: white;
+    background: linear-gradient(90deg, #ffcc00, #ff5733);
+    -webkit-background-clip: text;
+    background-clip: text;
+    animation: gradientText 5s linear infinite;
+    text-shadow: 3px 3px 8px rgba(0, 0, 0, 0.5);
+}
+
+/* Input fields */
+.auth-input {
+    width: 100%;
+    padding: 12px;
+    margin: 10px 0;
+    border: none;
+    border-radius: 8px;
+    background-color: #fff;
+    color: #333;
+    font-size: 1rem;
+    transition: all 0.3s ease-in-out;
+}
+
+.auth-input:focus {
+    outline: none;
+    box-shadow: 0 0 5px rgba(255, 87, 51, 0.8);
+    border-bottom: 2px solid #ffcc00;
+}
+
+/* Gender selection styling */
+.gender-container {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    margin: 10px 0;
+    color: white;
+    font-size: 1rem;
+}
+
+.gender-container label {
+    cursor: pointer;
+}
+
+/* Button styles */
+.auth-button {
+    width: 100%;
+    padding: 12px;
+    font-size: 1rem;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+    margin-top: 20px;
+    font-weight: bold;
+}
+
+.login-button {
+    background: linear-gradient(45deg, #ffcc00, #ff5733);
+    color: white;
+    box-shadow: 0 4px 12px rgba(255, 204, 0, 0.5);
+    border-radius: 10px;
+}
+
+.signup-button {
+    background: linear-gradient(45deg, #ff5733, #ffcc00);
+    color: white;
+    box-shadow: 0 4px 12px rgba(255, 87, 51, 0.5);
+    border-radius: 10px;
+}
+
+.auth-button:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 16px rgba(255, 204, 0, 0.8);
+}
+
+/* Toggle link between Login and Signup */
+.toggle-text {
+    color: #ffcc00;
+    margin-top: 15px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: bold;
+    text-decoration: underline;
+}
+
+/* Background gradient animation */
+@keyframes gradientBG {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* Animated gradient text for the title */
+@keyframes gradientText {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .form-container {
+        flex-direction: column;
+        width: 90%;
+        padding: 30px;
+    }
+
+    .form-left {
+        width: 100%;
+        border-right: none;
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .form-right {
+        width: 100%;
+    }
+
+    .homepage-title {
+        font-size: 2rem;
+        text-align: center;
+    }
+
+    .gender-container {
+        flex-direction: column;
+    }
+}

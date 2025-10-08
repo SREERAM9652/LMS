@@ -1,0 +1,161 @@
+/* Reset default margins and paddings */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Full-screen container */
+.homepage-container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-size: cover;
+    background-position: center;
+    color: white;
+    text-align: center;
+    font-family: Arial, sans-serif;
+    padding: 20px;
+    animation: fadeBackground 20s infinite;
+}
+
+/* Background images animation with fading effect */
+@keyframes fadeBackground {
+    0% { background: url('/src/images/coding_bg10.jpg') no-repeat center center/cover; }
+    20% { background: url('/src/images/coding_bg1.jpg') no-repeat center center/cover; }
+    40% { background: url('/src/images/coding_bg2.jpg') no-repeat center center/cover; }
+    60% { background: url('/src/images/coding_bg6.jpeg') no-repeat center center/cover; }
+    80% { background: url('/src/images/coding_bg11.jpg') no-repeat center center/cover; }
+    100% { background: url('/src/images/coding_bg10.jpg') no-repeat center center/cover; }
+}
+
+/* Title Styling with glow and animation */
+.homepage-title {
+    font-size: 4.5rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 4px;
+    text-align: center;
+    width: 100%;
+    padding: 0 30px;
+    margin: 0;
+    position: relative;
+    color: transparent;
+    background: linear-gradient(90deg, #ffcc00, #ff5733);
+    -webkit-background-clip: text;
+    background-clip: text;
+    text-shadow: 0px 0px 10px rgba(255, 204, 0, 0.8), 
+                 0px 0px 20px rgba(255, 87, 51, 0.8);
+    opacity: 1;
+    animation: fadeIn 2s ease-out 1s forwards;
+}
+
+/* Slide-in effect */
+@keyframes slideIn {
+    0% {
+        opacity: 0;
+        transform: translateY(-50px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Enhanced glow effect */
+@keyframes glowText {
+    0% {
+        text-shadow: 0px 0px 10px rgba(255, 204, 0, 0.7), 
+                     0px 0px 20px rgba(255, 87, 51, 0.7);
+    }
+    100% {
+        text-shadow: 0px 0px 20px rgba(255, 204, 0, 1), 
+                     0px 0px 40px rgba(255, 87, 51, 1), 
+                     0px 0px 60px rgba(255, 204, 0, 0.9);
+    }
+}
+
+/* Description Styling with fade-in animation */
+.homepage-description {
+    font-size: 1.2rem;
+    font-weight: bold;
+    max-width: 700px;
+    text-align: center;
+    margin: 20px 0;
+    color: #f2f2f2;
+    line-height: 1.8;
+    font-family: 'Roboto', sans-serif;
+    letter-spacing: 0.7px;
+    padding: 0 20px;
+    opacity: 1;
+    animation: fadeIn 2s ease-out 1s forwards;
+}
+
+/* Fade-in effect */
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Button container */
+.homepage-buttons {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    justify-content: center;
+    width: 100%;
+}
+
+/* Button Styling */
+.login-button,
+.signup-button {
+    padding: 14px 28px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    border: 2px solid transparent;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+}
+
+/* Login Button */
+.login-button {
+    background: linear-gradient(45deg, #ffcc00, #ff5733);
+    color: white;
+    box-shadow: 0 6px 16px rgba(255, 204, 0, 0.8), 0 8px 24px rgba(255, 87, 51, 0.6);
+}
+
+.login-button:hover {
+    background: linear-gradient(45deg, #ffdb4d, #ff704d);
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(255, 204, 0, 0.9), 0 10px 28px rgba(255, 87, 51, 0.7);
+}
+
+/* Sign-up Button */
+.signup-button {
+    background: #ff5733;
+    color: white;
+    box-shadow: 0 6px 16px rgba(255, 87, 51, 0.8);
+    position: relative;
+}
+
+.signup-button:hover {
+    background: linear-gradient(45deg,#ff704d, #ffdb4d);
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(255, 87, 51, 0.9);
+}
