@@ -19,7 +19,7 @@ const ProgressReport = () => {
 
   useEffect(() => {
     const fetchProgress = async () => {
-      const res = await axios.get(`http://localhost:5000/api/assessments/progress/${userId}`);
+      const res = await axios.get(`https://lms-2inz.onrender.com/api/assessments/progress/${userId}`);
       setProgress(res.data);
     };
     fetchProgress();
