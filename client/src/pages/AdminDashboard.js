@@ -9,9 +9,7 @@ const AdminDashboard = () => {
   const [submissions, setSubmissions] = useState([]);
 
   const userId = localStorage.getItem("userId"); // Admin user ID
-
-  // ✅ Use environment variable for backend URL
-  const API_BASE = process.env.REACT_APP_BACKEND_URI;
+  const API_BASE = process.env.REACT_APP_BACKEND_URI; // ✅ Use environment variable
 
   useEffect(() => {
     fetchSummary();
@@ -50,78 +48,18 @@ const AdminDashboard = () => {
     <>
       <style>
         {`
-          .dashboard-container {
-            padding: 20px;
-            max-width: 1200px;
-            margin: auto;
-          }
-
-          .card-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-            gap: 20px;
-            margin-bottom: 40px;
-          }
-
-          .card {
-            background-color: #ffffff;
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-            text-align: center;
-          }
-
-          .card h3 {
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: #007bff;
-          }
-
-          .card p {
-            font-size: 1.2rem;
-            margin-top: 10px;
-          }
-
-          .table-container {
-            margin-top: 30px;
-            margin-bottom: 30px;
-          }
-
-          table {
-            width: 100%;
-            border-collapse: collapse;
-            border-radius: 10px;
-            overflow: hidden;
-            background-color: #fff;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-          }
-
-          th, td {
-            padding: 15px;
-            text-align: left;
-            border-top: 1px solid #ddd;
-          }
-
-          th {
-            background-color: #f7f7f7;
-            font-weight: bold;
-          }
-
-          tr:hover {
-            background-color: #f1f1f1;
-          }
-
-          .table-container h2 {
-            font-size: 1.75rem;
-            font-weight: bold;
-            color: #333;
-            margin-bottom: 20px;
-          }
-
-          .table-container td, .table-container th {
-            font-size: 1rem;
-            color: #333;
-          }
+          .dashboard-container { padding: 300px; padding-top:10px; margin-left: 1000px; max-width: 1200px; margin: auto; }
+          .card-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 20px; margin-bottom: 40px; }
+          .card { background-color: #ffffff; padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); text-align: center; }
+          .card h3 { font-size: 1.5rem; font-weight: bold; color: #007bff; }
+          .card p { font-size: 1.2rem; margin-top: 10px; }
+          .table-container { margin-top: 30px; margin-bottom: 30px; }
+          table { width: 100%; border-collapse: collapse; border-radius: 10px; overflow: hidden; background-color: #fff; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); }
+          th, td { padding: 15px; text-align: left; border-top: 1px solid #ddd; }
+          th { background-color: #f7f7f7; font-weight: bold; }
+          tr:hover { background-color: #f1f1f1; }
+          .table-container h2 { font-size: 1.75rem; font-weight: bold; color: #333; margin-bottom: 20px; }
+          .table-container td, .table-container th { font-size: 1rem; color: #333; }
         `}
       </style>
 
