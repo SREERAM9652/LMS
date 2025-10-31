@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import Sidebar from "./Sidebar"; // Adjust the import path as needed
 
 const AdminDashboard = () => {
   const [summary, setSummary] = useState({});
@@ -12,6 +13,7 @@ const AdminDashboard = () => {
 
   const userId = localStorage.getItem("userId");
   const API_BASE = process.env.REACT_APP_BACKEND_URI;
+  const userRole = localStorage.getItem("role") || "admin"; // Get role from localStorage
 
   useEffect(() => {
     const fetchData = async () => {
@@ -58,6 +60,11 @@ const AdminDashboard = () => {
     setSubmissions(res.data);
   };
 
+  const handleLogout = () => {
+    localStorage.clear();
+    window.location.href = "/login";
+  };
+
   const StatCard = ({ title, value, icon, color, subtitle }) => (
     <div className="stat-card">
       <div className="stat-icon" style={{ backgroundColor: color }}>
@@ -91,155 +98,172 @@ const AdminDashboard = () => {
   }
 
   return (
-    <div className="admin-dashboard">
-      {/* Header */}
-      <header className="dashboard-header">
-        <div className="header-content">
-          <h1>Admin Dashboard</h1>
-          <div className="header-actions">
-            <button className="btn-primary">
-              <span className="btn-icon">+</span>
-              New Item
-            </button>
-            <div className="user-profile">
-              <div className="avatar">A</div>
-            </div>
-          </div>
-        </div>
-      </header>
-
-      {/* Navigation Tabs */}
-      <nav className="dashboard-tabs">
-        <TabButton 
-          name="Overview" 
-          isActive={activeTab === "overview"} 
-          onClick={setActiveTab}
-          icon="📊"
-        />
-        <TabButton 
-          name="Users" 
-          isActive={activeTab === "users"} 
-          onClick={setActiveTab}
-          icon="👥"
-        />
-        <TabButton 
-          name="Courses" 
-          isActive={activeTab === "courses"} 
-          onClick={setActiveTab}
-          icon="📚"
-        />
-        <TabButton 
-          name="Assessments" 
-          isActive={activeTab === "assessments"} 
-          onClick={setActiveTab}
-          icon="📝"
-        />
-        <TabButton 
-          name="Submissions" 
-          isActive={activeTab === "submissions"} 
-          onClick={setActiveTab}
-          icon="📨"
-        />
-      </nav>
-
+    <div className="app-container">
+      {/* Sidebar */}
+      <Sidebar role={userRole} onLogout={handleLogout} />
+      
       {/* Main Content */}
-      <main className="dashboard-main">
-        {/* Summary Cards */}
-        <section className="stats-section">
-          <div className="stats-grid">
-            <StatCard 
-              title="Total Users" 
-              value={summary.totalUsers} 
-              icon="👥"
-              color="#4f46e5"
-              subtitle="Registered users"
-            />
-            <StatCard 
-              title="Total Courses" 
-              value={summary.totalCourses} 
-              icon="📚"
-              color="#10b981"
-              subtitle="Available courses"
-            />
-            <StatCard 
-              title="Total Assessments" 
-              value={summary.totalAssessments} 
-              icon="📝"
-              color="#f59e0b"
-              subtitle="Active assessments"
-            />
-            <StatCard 
-              title="Total Submissions" 
-              value={summary.totalSubmissions} 
-              icon="📨"
-              color="#ef4444"
-              subtitle="Submitted work"
-            />
+      <div className="main-content">
+        {/* Header */}
+        <header className="dashboard-header">
+          <div className="header-content">
+            <h1>Admin Dashboard</h1>
+            <div className="header-actions">
+              <button className="btn-primary">
+                <span className="btn-icon">+</span>
+                New Item
+              </button>
+              <div className="user-profile">
+                <div className="avatar">
+                  {localStorage.getItem("userName")?.charAt(0) || "A"}
+                </div>
+              </div>
+            </div>
           </div>
-        </section>
+        </header>
 
-        {/* Data Tables */}
-        <section className="tables-section">
-          {activeTab === "overview" && (
-            <div className="tables-grid">
-              <DataTable 
-                title="Recent Users" 
-                data={users.slice(0, 5)} 
-                columns={["fullName", "email", "role"]}
-                viewAll={() => setActiveTab("users")}
+        {/* Navigation Tabs */}
+        <nav className="dashboard-tabs">
+          <TabButton 
+            name="Overview" 
+            isActive={activeTab === "overview"} 
+            onClick={setActiveTab}
+            icon="📊"
+          />
+          <TabButton 
+            name="Users" 
+            isActive={activeTab === "users"} 
+            onClick={setActiveTab}
+            icon="👥"
+          />
+          <TabButton 
+            name="Courses" 
+            isActive={activeTab === "courses"} 
+            onClick={setActiveTab}
+            icon="📚"
+          />
+          <TabButton 
+            name="Assessments" 
+            isActive={activeTab === "assessments"} 
+            onClick={setActiveTab}
+            icon="📝"
+          />
+          <TabButton 
+            name="Submissions" 
+            isActive={activeTab === "submissions"} 
+            onClick={setActiveTab}
+            icon="📨"
+          />
+        </nav>
+
+        {/* Main Content Area */}
+        <main className="dashboard-main">
+          {/* Summary Cards */}
+          <section className="stats-section">
+            <div className="stats-grid">
+              <StatCard 
+                title="Total Users" 
+                value={summary.totalUsers} 
+                icon="👥"
+                color="#4f46e5"
+                subtitle="Registered users"
               />
-              <DataTable 
-                title="Recent Courses" 
-                data={courses.slice(0, 5)} 
-                columns={["title", "desc"]}
-                viewAll={() => setActiveTab("courses")}
+              <StatCard 
+                title="Total Courses" 
+                value={summary.totalCourses} 
+                icon="📚"
+                color="#10b981"
+                subtitle="Available courses"
+              />
+              <StatCard 
+                title="Total Assessments" 
+                value={summary.totalAssessments} 
+                icon="📝"
+                color="#f59e0b"
+                subtitle="Active assessments"
+              />
+              <StatCard 
+                title="Total Submissions" 
+                value={summary.totalSubmissions} 
+                icon="📨"
+                color="#ef4444"
+                subtitle="Submitted work"
               />
             </div>
-          )}
-          
-          {activeTab === "users" && (
-            <DataTable 
-              title="All Users" 
-              data={users} 
-              columns={["fullName", "email", "role", "status"]}
-              searchable
-            />
-          )}
-          
-          {activeTab === "courses" && (
-            <DataTable 
-              title="All Courses" 
-              data={courses} 
-              columns={["title", "desc", "instructor", "enrolled"]}
-              searchable
-            />
-          )}
-          
-          {activeTab === "assessments" && (
-            <DataTable 
-              title="All Assessments" 
-              data={assessments} 
-              columns={["title", "courseId", "dueDate", "status"]}
-              searchable
-            />
-          )}
-          
-          {activeTab === "submissions" && (
-            <DataTable 
-              title="All Submissions" 
-              data={submissions} 
-              columns={["userId", "assessmentId", "score", "submittedAt", "status"]}
-              searchable
-            />
-          )}
-        </section>
-      </main>
+          </section>
+
+          {/* Data Tables */}
+          <section className="tables-section">
+            {activeTab === "overview" && (
+              <div className="tables-grid">
+                <DataTable 
+                  title="Recent Users" 
+                  data={users.slice(0, 5)} 
+                  columns={["fullName", "email", "role"]}
+                  viewAll={() => setActiveTab("users")}
+                />
+                <DataTable 
+                  title="Recent Courses" 
+                  data={courses.slice(0, 5)} 
+                  columns={["title", "desc"]}
+                  viewAll={() => setActiveTab("courses")}
+                />
+              </div>
+            )}
+            
+            {activeTab === "users" && (
+              <DataTable 
+                title="All Users" 
+                data={users} 
+                columns={["fullName", "email", "role", "status"]}
+                searchable
+              />
+            )}
+            
+            {activeTab === "courses" && (
+              <DataTable 
+                title="All Courses" 
+                data={courses} 
+                columns={["title", "desc", "instructor", "enrolled"]}
+                searchable
+              />
+            )}
+            
+            {activeTab === "assessments" && (
+              <DataTable 
+                title="All Assessments" 
+                data={assessments} 
+                columns={["title", "courseId", "dueDate", "status"]}
+                searchable
+              />
+            )}
+            
+            {activeTab === "submissions" && (
+              <DataTable 
+                title="All Submissions" 
+                data={submissions} 
+                columns={["userId", "assessmentId", "score", "submittedAt", "status"]}
+                searchable
+              />
+            )}
+          </section>
+        </main>
+      </div>
 
       <style jsx>{`
-        .admin-dashboard {
+        .app-container {
+          display: flex;
           min-height: 100vh;
           background-color: #f8fafc;
           font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        .main-content {
+          flex: 1;
+          margin-left: 250px; /* Adjust based on your sidebar width */
+          display: flex;
+          flex-direction: column;
+          min-height: 100vh;
         }
 
         /* Header Styles */
@@ -254,8 +278,6 @@ const AdminDashboard = () => {
           display: flex;
           justify-content: space-between;
           align-items: center;
-          max-width: 1400px;
-          margin: 0 auto;
         }
 
         .dashboard-header h1 {
@@ -306,8 +328,6 @@ const AdminDashboard = () => {
           background: white;
           border-bottom: 1px solid #e2e8f0;
           padding: 0 2rem;
-          max-width: 1400px;
-          margin: 0 auto;
         }
 
         .tab-button {
@@ -338,11 +358,11 @@ const AdminDashboard = () => {
           font-size: 1rem;
         }
 
-        /* Main Content */
+        /* Main Content Area */
         .dashboard-main {
-          max-width: 1400px;
-          margin: 0 auto;
+          flex: 1;
           padding: 2rem;
+          overflow-y: auto;
         }
 
         /* Stats Section */
@@ -535,6 +555,10 @@ const AdminDashboard = () => {
           .stats-grid {
             grid-template-columns: repeat(2, 1fr);
           }
+          
+          .main-content {
+            margin-left: 0;
+          }
         }
 
         @media (max-width: 768px) {
@@ -555,6 +579,11 @@ const AdminDashboard = () => {
           .dashboard-tabs {
             overflow-x: auto;
             white-space: nowrap;
+            padding: 0 1rem;
+          }
+          
+          .dashboard-header {
+            padding: 1rem;
           }
         }
       `}</style>
