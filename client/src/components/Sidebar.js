@@ -1,58 +1,107 @@
 import React from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import "../App.css";  
+import "./Sidebar.css";
 
-const Sidebar = ({ role, onLogout }) => {
+const Sidebar = ({ role, onLogout, isOpen, onToggle }) => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Function to check if a link is active
-  const isActive = (path) => (location.pathname === path ? "active" : "");
+  const isActive = (path) => location.pathname === path ? "active" : "";
+
+  const menuItems = [
+    { path: "/dashboard", icon: "📊", label: "Dashboard" },
+    { path: "/courses", icon: "📚", label: "Courses" },
+    { path: "/assessments", icon: "📝", label: "Assessments" },
+    { path: "/forum", icon: "💻", label: "Discussion Forum" },
+  ];
+
+  const adminItems = [
+    { path: "/admin/dashboard", icon: "👨‍💼", label: "Admin Dashboard" },
+    { path: "/analytics", icon: "📈", label: "Analytics" },
+    { path: "/create-course", icon: "➕", label: "Add Course" },
+  ];
+
+  const userItems = [
+    { path: "/profile", icon: "👤", label: "Profile" },
+    { path: "/settings", icon: "⚙️", label: "Settings" },
+    { path: "/support", icon: "🛟", label: "Support" },
+  ];
 
   return (
-    <nav className="col-md-3 col-lg-2 d-md-block sidebar">
-      <div className="position-sticky">
-        <h2 className="text-center py-3">🎓 LMS</h2>
-        <ul className="nav flex-column">
-          <li className="nav-item">
-            <button className={`nav-link ${isActive("/dashboard")}`} onClick={() => navigate("/dashboard")}>📊 Dashboard</button>
-          </li>
-          <li className="nav-item">
-            <button className={`nav-link ${isActive("/courses")}`} onClick={() => navigate("/courses")}>📚 Courses</button>
-          </li>
-          <li className="nav-item">
-            <button className={`nav-link ${isActive("/assessments")}`} onClick={() => navigate("/assessments")}>📝 Assessments</button>
-          </li>
-          
-          <li className="nav-item">
-            <button className={`nav-link ${isActive("/forum")}`} onClick={() => navigate("/forum")}>💻 Discussion Forum</button>
-          </li>
-          
+    <>
+      {isOpen && <div className="sidebar-overlay" onClick={onToggle}></div>}
+      <aside className={`sidebar ${isOpen ? 'open' : ''}`}>
+        <div className="sidebar-header">
+          <div className="logo">
+            <span className="logo-icon">🎓</span>
+            <span className="logo-text">LMS Pro</span>
+          </div>
+          <button className="sidebar-close" onClick={onToggle}>×</button>
+        </div>
 
-          {/* Admin-only options */}
+        <nav className="sidebar-nav">
+          <div className="nav-section">
+            <div className="nav-label">Main Menu</div>
+            {menuItems.map((item) => (
+              <button
+                key={item.path}
+                className={`nav-link ${isActive(item.path)}`}
+                onClick={() => {
+                  navigate(item.path);
+                  onToggle();
+                }}
+              >
+                <span className="nav-icon">{item.icon}</span>
+                <span className="nav-text">{item.label}</span>
+              </button>
+            ))}
+          </div>
+
           {role?.toLowerCase() === "admin" && (
-            <>
-              <li className="nav-item">
-                <button className={`nav-link ${isActive("/analytics")}`} onClick={() => navigate("/analytics")}>📈 Analytics</button>
-              </li>
-              <li className="nav-item">
-                <button className={`nav-link ${isActive("/create-course")}`} onClick={() => navigate("/create-course")}>➕ Add Course</button>
-              </li>
-            </>
+            <div className="nav-section">
+              <div className="nav-label">Administration</div>
+              {adminItems.map((item) => (
+                <button
+                  key={item.path}
+                  className={`nav-link ${isActive(item.path)}`}
+                  onClick={() => {
+                    navigate(item.path);
+                    onToggle();
+                  }}
+                >
+                  <span className="nav-icon">{item.icon}</span>
+                  <span className="nav-text">{item.label}</span>
+                </button>
+              ))}
+            </div>
           )}
 
-          <li className="nav-item">
-            <button className={`nav-link ${isActive("/profile")}`} onClick={() => navigate("/profile")}>👤 Profile</button>
-          </li>
-          
+          <div className="nav-section">
+            <div className="nav-label">Account</div>
+            {userItems.map((item) => (
+              <button
+                key={item.path}
+                className={`nav-link ${isActive(item.path)}`}
+                onClick={() => {
+                  navigate(item.path);
+                  onToggle();
+                }}
+              >
+                <span className="nav-icon">{item.icon}</span>
+                <span className="nav-text">{item.label}</span>
+              </button>
+            ))}
+          </div>
+        </nav>
 
-          {/* Logout Button */}
-          <li className="nav-item">
-            <button className="nav-link text-danger" onClick={onLogout}>🚪 Logout</button>
-          </li>
-        </ul>
-      </div>
-    </nav>
+        <div className="sidebar-footer">
+          <button className="logout-btn" onClick={onLogout}>
+            <span className="nav-icon">🚪</span>
+            <span className="nav-text">Logout</span>
+          </button>
+        </div>
+      </aside>
+    </>
   );
 };
 
