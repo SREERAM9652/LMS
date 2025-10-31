@@ -7,16 +7,30 @@ const AdminDashboard = () => {
   const [courses, setCourses] = useState([]);
   const [assessments, setAssessments] = useState([]);
   const [submissions, setSubmissions] = useState([]);
+  const [activeTab, setActiveTab] = useState("overview");
+  const [loading, setLoading] = useState(true);
 
-  const userId = localStorage.getItem("userId"); // Admin user ID
-  const API_BASE = process.env.REACT_APP_BACKEND_URI; // ✅ Use environment variable
+  const userId = localStorage.getItem("userId");
+  const API_BASE = process.env.REACT_APP_BACKEND_URI;
 
   useEffect(() => {
-    fetchSummary();
-    fetchUsers();
-    fetchCourses();
-    fetchAssessments();
-    fetchSubmissions();
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        await Promise.all([
+          fetchSummary(),
+          fetchUsers(),
+          fetchCourses(),
+          fetchAssessments(),
+          fetchSubmissions()
+        ]);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
   }, []);
 
   const fetchSummary = async () => {
@@ -44,92 +58,580 @@ const AdminDashboard = () => {
     setSubmissions(res.data);
   };
 
-  return (
-    <>
-      <style>
-        {`
-          .dashboard-container { padding: 300px; padding-top:10px; margin-left: 1000px; max-width: 1200px; margin: auto; }
-          .card-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 20px; margin-bottom: 40px; }
-          .card { background-color: #ffffff; padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); text-align: center; }
-          .card h3 { font-size: 1.5rem; font-weight: bold; color: #007bff; }
-          .card p { font-size: 1.2rem; margin-top: 10px; }
-          .table-container { margin-top: 30px; margin-bottom: 30px; }
-          table { width: 100%; border-collapse: collapse; border-radius: 10px; overflow: hidden; background-color: #fff; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); }
-          th, td { padding: 15px; text-align: left; border-top: 1px solid #ddd; }
-          th { background-color: #f7f7f7; font-weight: bold; }
-          tr:hover { background-color: #f1f1f1; }
-          .table-container h2 { font-size: 1.75rem; font-weight: bold; color: #333; margin-bottom: 20px; }
-          .table-container td, .table-container th { font-size: 1rem; color: #333; }
-        `}
-      </style>
-
-      <div className="dashboard-container">
-        <h1 className="text-3xl font-bold mb-6">Admin Dashboard</h1>
-
-        {/* Summary Cards */}
-        <div className="card-container">
-          <div className="card">
-            <h3>Users</h3>
-            <p>{summary.totalUsers ?? 0}</p>
-          </div>
-          <div className="card">
-            <h3>Courses</h3>
-            <p>{summary.totalCourses ?? 0}</p>
-          </div>
-          <div className="card">
-            <h3>Assessments</h3>
-            <p>{summary.totalAssessments ?? 0}</p>
-          </div>
-          <div className="card">
-            <h3>Submissions</h3>
-            <p>{summary.totalSubmissions ?? 0}</p>
-          </div>
-        </div>
-
-        {/* Tables */}
-        <div className="table-container">
-          <Section title="Users" data={users} columns={["fullName", "email", "role"]} />
-          <Section title="Courses" data={courses} columns={["title", "desc"]} />
-          <Section title="Assessments" data={assessments} columns={["title", "courseId"]} />
-          <Section title="Submissions" data={submissions} columns={["userId", "assessmentId", "score"]} />
-        </div>
+  const StatCard = ({ title, value, icon, color, subtitle }) => (
+    <div className="stat-card">
+      <div className="stat-icon" style={{ backgroundColor: color }}>
+        {icon}
       </div>
-    </>
+      <div className="stat-content">
+        <h3>{value ?? 0}</h3>
+        <p>{title}</p>
+        {subtitle && <span className="stat-subtitle">{subtitle}</span>}
+      </div>
+    </div>
+  );
+
+  const TabButton = ({ name, isActive, onClick, icon }) => (
+    <button 
+      className={`tab-button ${isActive ? 'active' : ''}`}
+      onClick={() => onClick(name)}
+    >
+      <span className="tab-icon">{icon}</span>
+      {name}
+    </button>
+  );
+
+  if (loading) {
+    return (
+      <div className="dashboard-loading">
+        <div className="loading-spinner"></div>
+        <p>Loading dashboard data...</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="admin-dashboard">
+      {/* Header */}
+      <header className="dashboard-header">
+        <div className="header-content">
+          <h1>Admin Dashboard</h1>
+          <div className="header-actions">
+            <button className="btn-primary">
+              <span className="btn-icon">+</span>
+              New Item
+            </button>
+            <div className="user-profile">
+              <div className="avatar">A</div>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      {/* Navigation Tabs */}
+      <nav className="dashboard-tabs">
+        <TabButton 
+          name="Overview" 
+          isActive={activeTab === "overview"} 
+          onClick={setActiveTab}
+          icon="📊"
+        />
+        <TabButton 
+          name="Users" 
+          isActive={activeTab === "users"} 
+          onClick={setActiveTab}
+          icon="👥"
+        />
+        <TabButton 
+          name="Courses" 
+          isActive={activeTab === "courses"} 
+          onClick={setActiveTab}
+          icon="📚"
+        />
+        <TabButton 
+          name="Assessments" 
+          isActive={activeTab === "assessments"} 
+          onClick={setActiveTab}
+          icon="📝"
+        />
+        <TabButton 
+          name="Submissions" 
+          isActive={activeTab === "submissions"} 
+          onClick={setActiveTab}
+          icon="📨"
+        />
+      </nav>
+
+      {/* Main Content */}
+      <main className="dashboard-main">
+        {/* Summary Cards */}
+        <section className="stats-section">
+          <div className="stats-grid">
+            <StatCard 
+              title="Total Users" 
+              value={summary.totalUsers} 
+              icon="👥"
+              color="#4f46e5"
+              subtitle="Registered users"
+            />
+            <StatCard 
+              title="Total Courses" 
+              value={summary.totalCourses} 
+              icon="📚"
+              color="#10b981"
+              subtitle="Available courses"
+            />
+            <StatCard 
+              title="Total Assessments" 
+              value={summary.totalAssessments} 
+              icon="📝"
+              color="#f59e0b"
+              subtitle="Active assessments"
+            />
+            <StatCard 
+              title="Total Submissions" 
+              value={summary.totalSubmissions} 
+              icon="📨"
+              color="#ef4444"
+              subtitle="Submitted work"
+            />
+          </div>
+        </section>
+
+        {/* Data Tables */}
+        <section className="tables-section">
+          {activeTab === "overview" && (
+            <div className="tables-grid">
+              <DataTable 
+                title="Recent Users" 
+                data={users.slice(0, 5)} 
+                columns={["fullName", "email", "role"]}
+                viewAll={() => setActiveTab("users")}
+              />
+              <DataTable 
+                title="Recent Courses" 
+                data={courses.slice(0, 5)} 
+                columns={["title", "desc"]}
+                viewAll={() => setActiveTab("courses")}
+              />
+            </div>
+          )}
+          
+          {activeTab === "users" && (
+            <DataTable 
+              title="All Users" 
+              data={users} 
+              columns={["fullName", "email", "role", "status"]}
+              searchable
+            />
+          )}
+          
+          {activeTab === "courses" && (
+            <DataTable 
+              title="All Courses" 
+              data={courses} 
+              columns={["title", "desc", "instructor", "enrolled"]}
+              searchable
+            />
+          )}
+          
+          {activeTab === "assessments" && (
+            <DataTable 
+              title="All Assessments" 
+              data={assessments} 
+              columns={["title", "courseId", "dueDate", "status"]}
+              searchable
+            />
+          )}
+          
+          {activeTab === "submissions" && (
+            <DataTable 
+              title="All Submissions" 
+              data={submissions} 
+              columns={["userId", "assessmentId", "score", "submittedAt", "status"]}
+              searchable
+            />
+          )}
+        </section>
+      </main>
+
+      <style jsx>{`
+        .admin-dashboard {
+          min-height: 100vh;
+          background-color: #f8fafc;
+          font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        /* Header Styles */
+        .dashboard-header {
+          background: white;
+          border-bottom: 1px solid #e2e8f0;
+          padding: 1rem 2rem;
+          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .header-content {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          max-width: 1400px;
+          margin: 0 auto;
+        }
+
+        .dashboard-header h1 {
+          font-size: 1.875rem;
+          font-weight: 700;
+          color: #1e293b;
+          margin: 0;
+        }
+
+        .header-actions {
+          display: flex;
+          align-items: center;
+          gap: 1rem;
+        }
+
+        .btn-primary {
+          background: #4f46e5;
+          color: white;
+          border: none;
+          padding: 0.75rem 1.5rem;
+          border-radius: 0.5rem;
+          font-weight: 600;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          transition: background-color 0.2s;
+        }
+
+        .btn-primary:hover {
+          background: #4338ca;
+        }
+
+        .user-profile .avatar {
+          width: 2.5rem;
+          height: 2.5rem;
+          border-radius: 50%;
+          background: #4f46e5;
+          color: white;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-weight: 600;
+        }
+
+        /* Tab Navigation */
+        .dashboard-tabs {
+          background: white;
+          border-bottom: 1px solid #e2e8f0;
+          padding: 0 2rem;
+          max-width: 1400px;
+          margin: 0 auto;
+        }
+
+        .tab-button {
+          background: none;
+          border: none;
+          padding: 1rem 1.5rem;
+          font-size: 0.875rem;
+          font-weight: 500;
+          color: #64748b;
+          cursor: pointer;
+          border-bottom: 2px solid transparent;
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          transition: all 0.2s;
+        }
+
+        .tab-button:hover {
+          color: #4f46e5;
+        }
+
+        .tab-button.active {
+          color: #4f46e5;
+          border-bottom-color: #4f46e5;
+        }
+
+        .tab-icon {
+          font-size: 1rem;
+        }
+
+        /* Main Content */
+        .dashboard-main {
+          max-width: 1400px;
+          margin: 0 auto;
+          padding: 2rem;
+        }
+
+        /* Stats Section */
+        .stats-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+          gap: 1.5rem;
+          margin-bottom: 2rem;
+        }
+
+        .stat-card {
+          background: white;
+          padding: 1.5rem;
+          border-radius: 0.75rem;
+          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+          display: flex;
+          align-items: center;
+          gap: 1rem;
+          transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .stat-card:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .stat-icon {
+          width: 3rem;
+          height: 3rem;
+          border-radius: 0.75rem;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 1.25rem;
+          color: white;
+        }
+
+        .stat-content h3 {
+          font-size: 1.875rem;
+          font-weight: 700;
+          color: #1e293b;
+          margin: 0 0 0.25rem 0;
+        }
+
+        .stat-content p {
+          font-size: 0.875rem;
+          font-weight: 600;
+          color: #1e293b;
+          margin: 0;
+        }
+
+        .stat-subtitle {
+          font-size: 0.75rem;
+          color: #64748b;
+          margin-top: 0.25rem;
+        }
+
+        /* Tables Section */
+        .tables-grid {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 1.5rem;
+        }
+
+        .data-table {
+          background: white;
+          border-radius: 0.75rem;
+          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+          overflow: hidden;
+        }
+
+        .table-header {
+          padding: 1.25rem 1.5rem;
+          border-bottom: 1px solid #e2e8f0;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+        }
+
+        .table-header h2 {
+          font-size: 1.125rem;
+          font-weight: 600;
+          color: #1e293b;
+          margin: 0;
+        }
+
+        .table-actions {
+          display: flex;
+          gap: 0.5rem;
+        }
+
+        .btn-secondary {
+          background: #f1f5f9;
+          border: 1px solid #e2e8f0;
+          padding: 0.5rem 1rem;
+          border-radius: 0.375rem;
+          font-size: 0.875rem;
+          font-weight: 500;
+          cursor: pointer;
+          transition: background-color 0.2s;
+        }
+
+        .btn-secondary:hover {
+          background: #e2e8f0;
+        }
+
+        .search-box {
+          padding: 0.5rem 1rem;
+          border: 1px solid #e2e8f0;
+          border-radius: 0.375rem;
+          font-size: 0.875rem;
+          width: 200px;
+        }
+
+        .table-container {
+          overflow-x: auto;
+        }
+
+        table {
+          width: 100%;
+          border-collapse: collapse;
+        }
+
+        thead {
+          background: #f8fafc;
+        }
+
+        th {
+          padding: 0.75rem 1.5rem;
+          text-align: left;
+          font-size: 0.75rem;
+          font-weight: 600;
+          color: #64748b;
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
+          border-bottom: 1px solid #e2e8f0;
+        }
+
+        td {
+          padding: 1rem 1.5rem;
+          border-bottom: 1px solid #e2e8f0;
+          font-size: 0.875rem;
+          color: #1e293b;
+        }
+
+        tbody tr:hover {
+          background: #f8fafc;
+        }
+
+        tbody tr:last-child td {
+          border-bottom: none;
+        }
+
+        .no-data {
+          padding: 2rem;
+          text-align: center;
+          color: #64748b;
+        }
+
+        /* Loading State */
+        .dashboard-loading {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          height: 50vh;
+          gap: 1rem;
+        }
+
+        .loading-spinner {
+          width: 2rem;
+          height: 2rem;
+          border: 2px solid #e2e8f0;
+          border-top: 2px solid #4f46e5;
+          border-radius: 50%;
+          animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+          .tables-grid {
+            grid-template-columns: 1fr;
+          }
+          
+          .stats-grid {
+            grid-template-columns: repeat(2, 1fr);
+          }
+        }
+
+        @media (max-width: 768px) {
+          .dashboard-main {
+            padding: 1rem;
+          }
+          
+          .stats-grid {
+            grid-template-columns: 1fr;
+          }
+          
+          .header-content {
+            flex-direction: column;
+            gap: 1rem;
+            align-items: flex-start;
+          }
+          
+          .dashboard-tabs {
+            overflow-x: auto;
+            white-space: nowrap;
+          }
+        }
+      `}</style>
+    </div>
   );
 };
 
-const Section = ({ title, data, columns }) => (
-  <div className="table-container">
-    <h2>{title}</h2>
-    <div className="overflow-x-auto">
-      <table>
-        <thead>
-          <tr>
-            {columns.map((col) => (
-              <th key={col} className="px-4 py-2 text-left capitalize">{col}</th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {data?.length > 0 ? (
-            data.map((item, idx) => (
-              <tr key={idx}>
-                {columns.map((col) => (
-                  <td key={col} className="px-4 py-2">
-                    {item[col]?.title || item[col]?.fullName || item[col] || "-"}
-                  </td>
-                ))}
-              </tr>
-            ))
-          ) : (
-            <tr>
-              <td colSpan={columns.length} className="px-4 py-2 text-center">No data found.</td>
-            </tr>
+const DataTable = ({ title, data, columns, searchable, viewAll }) => {
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filteredData, setFilteredData] = useState(data);
+
+  useEffect(() => {
+    if (searchTerm) {
+      const filtered = data.filter(item =>
+        columns.some(col => 
+          String(item[col] || '').toLowerCase().includes(searchTerm.toLowerCase())
+        )
+      );
+      setFilteredData(filtered);
+    } else {
+      setFilteredData(data);
+    }
+  }, [searchTerm, data, columns]);
+
+  return (
+    <div className="data-table">
+      <div className="table-header">
+        <h2>{title}</h2>
+        <div className="table-actions">
+          {searchable && (
+            <input
+              type="text"
+              placeholder="Search..."
+              className="search-box"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
           )}
-        </tbody>
-      </table>
+          {viewAll && (
+            <button className="btn-secondary" onClick={viewAll}>
+              View All
+            </button>
+          )}
+        </div>
+      </div>
+      <div className="table-container">
+        <table>
+          <thead>
+            <tr>
+              {columns.map((col) => (
+                <th key={col} className="capitalize">{col}</th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {filteredData?.length > 0 ? (
+              filteredData.map((item, idx) => (
+                <tr key={idx}>
+                  {columns.map((col) => (
+                    <td key={col}>
+                      {item[col]?.title || item[col]?.fullName || item[col] || "-"}
+                    </td>
+                  ))}
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan={columns.length} className="no-data">
+                  No data found
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 export default AdminDashboard;
