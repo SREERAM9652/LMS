@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import Sidebar from "./Sidebar"; // Adjust the import path as needed
+import Sidebar from "./components/Sidebar"; // Adjust the import path as needed
 
 const AdminDashboard = () => {
   const [summary, setSummary] = useState({});
