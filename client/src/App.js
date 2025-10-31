@@ -13,7 +13,7 @@ import Profile from "./pages/Profile";
 import Settings from "./pages/Settings";
 import Support from "./pages/Support";
 import LoginSignup from "./components/LoginSignup"; 
-import PersonalInfo from "./pages/personalInfo";
+import PersonalInfo from "./pages/PersonalInfo";
 import CreateCourse from "./pages/CreateCourse";
 import EditCourse from "./pages/EditCourse";
 import EnrolledCourses from "./pages/EnrolledCourses";
@@ -27,16 +27,14 @@ import ForumPage from "./pages/ForumPage";
 import CompletedAssessments from "./pages/CompletedAssessments";
 import ProgressReport from "./pages/ProgressReport";
 import AdminDashboard from "./pages/AdminDashboard";
-
-
-
+import LoadingSpinner from "./components/LoadingSpinner";
 import "./App.css";
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [role, setRole] = useState("");
-  
-
+  const [loading, setLoading] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
     const storedRole = localStorage.getItem("role");
@@ -44,34 +42,55 @@ function App() {
 
     if (storedLoginStatus === "true") {
       setIsLoggedIn(true);
-      setRole(storedRole || "user"); // Default to "user"
+      setRole(storedRole || "user");
     }
+    setLoading(false);
   }, []);
 
-  // ✅ Logout function
   const handleLogout = () => {
     const confirmLogout = window.confirm("Are you sure you want to logout?");
     if (confirmLogout) {
       localStorage.removeItem("isLoggedIn");
       localStorage.removeItem("role");
+      localStorage.removeItem("userId");
+      localStorage.removeItem("token");
       setIsLoggedIn(false);
+      setSidebarOpen(false);
     }
   };
-  
+
+  const toggleSidebar = () => {
+    setSidebarOpen(!sidebarOpen);
+  };
+
+  if (loading) {
+    return <LoadingSpinner />;
+  }
 
   return (
     <Router>
-      <div className="flex h-screen">
-        {/* Show Sidebar only if logged in */}
-        {isLoggedIn && <Sidebar role={role} onLogout={handleLogout} />}
+      <div className="app-container">
+        {isLoggedIn && (
+          <Sidebar 
+            role={role} 
+            onLogout={handleLogout} 
+            isOpen={sidebarOpen}
+            onToggle={toggleSidebar}
+          />
+        )}
         
-        <div className="flex-1 p-4">
+        <main className={`main-content ${isLoggedIn ? 'with-sidebar' : ''} ${sidebarOpen ? 'sidebar-open' : ''}`}>
+          {isLoggedIn && (
+            <button className="sidebar-toggle-btn" onClick={toggleSidebar}>
+              ☰
+            </button>
+          )}
+          
           <Routes>
             <Route path="/" element={<HomePage />} />
             <Route path="/login" element={<LoginSignup formType="login" setIsLoggedIn={setIsLoggedIn} />} />
             <Route path="/signup" element={<LoginSignup formType="signup" setIsLoggedIn={setIsLoggedIn} />} />
             
-            {/* Protected Routes (Require Login) */}
             {isLoggedIn ? (
               <>
                 <Route path="/dashboard" element={<Dashboard />} />
@@ -95,16 +114,15 @@ function App() {
                 <Route path="/edit-course/:id" element={<EditCourse />} />
                 <Route path="/enrolled-courses/:userId" element={<EnrolledCourses />} />
                 <Route path="/forum/announcements" element={<Announcements />} />
-                <Route path="/forum/courses" element={<ForumPage  />} />
+                <Route path="/forum/courses" element={<ForumPage />} />
                 <Route path="/assessments/completed" element={<CompletedAssessments />} />
-<Route path="/assessments/analytics" element={<ProgressReport />} />
-
+                <Route path="/assessments/analytics" element={<ProgressReport />} />
               </>
             ) : (
               <Route path="*" element={<Navigate to="/login" />} />
             )}
           </Routes>
-        </div>
+        </main>
       </div>
     </Router>
   );
